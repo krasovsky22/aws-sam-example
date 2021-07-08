@@ -1,12 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  sam-typescript-webpack
-
-  Sample SAM Template for sam-typescript-webpack
+  Ambry Image Generation Service
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
-
 Globals:
   Function:
     Runtime: nodejs14.x
@@ -17,7 +14,7 @@ Resources:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: src/handlers
-      Handler: hello.handler
+      Handler: bayesdel.handler
       Runtime: nodejs14.x
       Events:
         HelloWorld:
@@ -32,7 +29,7 @@ Outputs:
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
   ImageGenerationApi:
     Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/images/bayesdel/{alteration}"
   BayesDelImageGenerationFunction:
     Description: "Bayesdel Image Generation ARN"
     Value: !GetAtt BayesDelImageGenerationFunction.Arn
