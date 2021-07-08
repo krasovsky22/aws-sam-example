@@ -4,6 +4,12 @@
     "module": "commonjs",
     "noImplicitAny": true,
     "target": "es2019",
-    "types": ["node", "jest"]
-  }
+    "types": ["node", "jest"],
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "preserveConstEnums": true,
+    "typeRoots": ["node_modules/@types"]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "**/*.spec.ts"]
 }

@@ -1,80 +1,47 @@
-import { readFileSync } from 'fs';
-import { join, resolve } from 'path';
+import { resolve } from 'path';
 import { Configuration } from 'webpack';
-import { yamlParse } from 'yaml-cfn';
 
-/**
- * webpack config taken from https://github.com/elthrasher/sam-typescript-webpack-sample/blob/master/webpack.config.ts
- */
-
-/** Interface for AWS SAM Function */
-interface ISamFunction {
-  Type: string;
-  Properties: {
-    AssumeRolePolicyDocument?: JSON;
-    AutoPublishAlias?: string;
-    AutoPublishCodeSha256?: string;
-    CodeUri?: string;
-    Description?: string;
-    Environment?: {
-      Variables: {
-        [key: string]: string;
-      };
-    };
-    Events?: EventSource;
-    FunctionName?: string;
-    Handler: string;
-    Layers?: { [Ref: string]: string }[];
-    Runtime: string;
-    Timeout?: number;
-    Tracing?: string;
-    VersionDescription?: string;
-  };
-}
-
-// Grab Globals and Resources as objects from template yaml
-const { Globals, Resources } = yamlParse(readFileSync(join(__dirname, 'template.yaml'), 'utf-8'));
-
-// We use globals as a fallback, so make sure that object exists.
-const GlobalFunction = Globals?.Function ?? {};
-
-// Where my function source lives
-const handlerPath = './src/handlers';
-
-const entries = Object.values(Resources)
-  // Take only the Lambda function resources
-  .filter((resource: ISamFunction) => resource.Type === 'AWS::Serverless::Function')
-  // Only nodejs Lambda functions
-  .filter((resource: ISamFunction) => (resource.Properties?.Runtime ?? GlobalFunction.Runtime).startsWith('nodejs'))
-  // Get filename for each function and output directory (if desired)
-  .map((resource: ISamFunction) => ({
-    filename: resource.Properties.Handler.split('.')[0],
-    entryPath: resource.Properties.CodeUri.split('/').splice(1).join('/'),
-  }))
-  // Create hashmap of filename to file path
-  .reduce(
-    (resources, resource) =>
-      Object.assign(resources, {
-        [`${resource.entryPath}/${resource.filename}`]: `${handlerPath}/${resource.filename}.ts`,
-      }),
-    {},
-  );
+const AwsSamPlugin = require('aws-sam-webpack-plugin');
+const awsSamPlugin = new AwsSamPlugin();
 
 const config: Configuration = {
+  // Set the webpack mode
   mode: process.env.NODE_ENV === 'dev' ? 'development' : 'production',
-  entry: entries,
+
+  // Loads the entry object from the AWS::Serverless::Function resources in your
+  // SAM config. Setting this to a function will
+  entry: () => awsSamPlugin.entry(),
+
+  // Write the output to the .aws-sam/build folder
   output: {
-    filename: '[name].js',
+    filename: (chunkData) => awsSamPlugin.filename(chunkData),
     libraryTarget: 'commonjs2',
-    path: resolve(__dirname, 'build'),
+    path: resolve('.'),
   },
+
+  // Create source maps
+  devtool: 'source-map',
+
+  // Target node
+  target: 'node',
+
+  // AWS recommends always including the aws-sdk in your Lambda package but excluding can significantly reduce
+  // the size of your deployment package. If you want to always include it then comment out this line. It has
+  // been included conditionally because the node10.x docker image used by SAM local doesn't include it.
+  externals: process.env.NODE_ENV === 'development' ? [] : ['aws-sdk'],
+
+  // Add the TypeScript loader
   module: {
     rules: [{ test: /\.ts$/, loader: 'ts-loader' }],
   },
+
+  // Resolve .ts and .js extensions
   resolve: {
     extensions: ['.js', '.ts'],
   },
-  target: 'node',
+
+  // Add the AWS SAM Webpack plugin
+  plugins: [awsSamPlugin],
 };
 
 export default config;
