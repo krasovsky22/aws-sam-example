@@ -38,6 +38,10 @@ const config: Configuration = {
   // Resolve .ts and .js extensions
   resolve: {
     extensions: ['.js', '.ts'],
+    alias: {
+      '@utils': resolve('src/utils'),
+      '@handlers': resolve('src/handlers'),
+    },
   },
 
   // Add the AWS SAM Webpack plugin

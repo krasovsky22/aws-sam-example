@@ -1,15 +1,38 @@
 {
   "compilerOptions": {
+    "rootDir": ".",
+    "baseUrl": ".",
     "alwaysStrict": true,
     "module": "commonjs",
     "noImplicitAny": true,
     "target": "es2019",
-    "types": ["node", "jest"],
+    "types": [
+      "node",
+      "jest"
+    ],
     "resolveJsonModule": true,
     "sourceMap": true,
     "preserveConstEnums": true,
-    "typeRoots": ["node_modules/@types"]
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "paths": {
+      "@utils/*": [
+        "src/utils/*"
+      ],
+      "@utils": [
+        "src/utils/index.ts"
+      ],
+      "@handlers/*": [
+        "src/handlers/*"
+      ]
+    }
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "**/*.spec.ts"]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+  ]
 }

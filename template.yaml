@@ -8,6 +8,17 @@ Globals:
   Function:
     Runtime: nodejs14.x
     Timeout: 300
+    Environment:
+      Variables:
+        AVI_URL: !Ref aviUrlValue
+        AVI_TIMEOUT: !Ref aviAxiosTimeout
+
+Parameters:
+  aviUrlValue:
+    Type: String
+  aviAxiosTimeout:
+    Type: Number
+    Default: 10000
 
 Resources:
   BayesDelImageGenerationFunction:

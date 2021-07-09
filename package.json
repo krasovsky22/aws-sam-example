@@ -9,10 +9,10 @@
     "clean": "rimraf build",
     "clean-sam": "rm -rf .aws-sam",
     "lint": "eslint --ext .ts .",
-    "test": "jest",
+    "test": "jest --setupFiles dotenv/config",
     "deploy": "sam deploy",
     "watch:webpack": "npm run build -- --watch",
-    "watch:sam": "dotenv -- cross-var sam local start-api --host %HOST%"
+    "watch:sam": "dotenv -- cross-var sam local start-api --host %HOST% --env-vars .env.json"
   },
   "author": "",
   "license": "ISC",
@@ -22,15 +22,20 @@
     "aws-lambda": "^1.0.6",
     "aws-sam-webpack-plugin": "^0.9.0",
     "aws-sdk": "^2.942.0",
+    "axios": "^0.21.1",
     "cross-var": "^1.1.0",
     "dotenv-cli": "^4.0.0",
     "rimraf": "^3.0.2",
     "source-map-support": "^0.5.19",
     "winston": "^3.3.3",
-    "yaml-cfn": "^0.3.1"
+    "yaml-cfn": "^0.3.1",
+    "d3": "^4.13.0",
+    "d3-node": "^1.1.3",
+    "d3-scale-chromatic": "^1.2.0"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.77",
+    "@types/d3": "^7.0.0",
     "@types/jest": "^26.0.23",
     "@types/mocha": "^8.2.2",
     "@types/webpack": "^5.28.0",
@@ -40,14 +45,28 @@
     "eslint": "^7.30.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",
+    "husky": "^2.5.0",
     "jest": "^26.6.3",
     "lint": "^0.7.0",
+    "lint-staged": "^11.0.0",
     "prettier": "^2.3.2",
-    "ts-jest": "^27.0.3",
+    "ts-jest": "^26.5.5",
     "ts-loader": "^9.2.3",
     "ts-node": "^10.0.0",
     "typescript": "^4.3.5",
     "webpack": "^5.42.0",
     "webpack-cli": "^4.7.2"
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "post-commit": "git update-index --again"
+    }
   }
 }
